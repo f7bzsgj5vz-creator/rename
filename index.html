@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高精度画像向き補正 & コード照合リネーマー (APIキー設定対応版)</title>
+  <title>高精度画像向き補正 & コード照合リネーマー</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,21 +11,19 @@
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-    .img-preview { max-height: 200px; max-width: 100%; object-fit: contain; transition: transform 0.2s ease-in-out; }
-    .details-drawer { transition: all 0.3s ease-in-out; }
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 font-sans flex flex-col">
 
   <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center gap-3">
         <div class="p-2 bg-indigo-600 rounded-lg">
           <i class="fa-solid fa-bolt text-xl text-amber-300"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold leading-tight">高精度画像向き補正 & コード照合リネーマー</h1>
-          <p class="text-xs text-indigo-200">4枚並列超高速解析 ＆ 「毎日新聞」上側優先補正システム</p>
+          <h1 class="text-sm font-bold leading-tight">高精度画像向き補正 & コード照合リネーマー</h1>
+          <p class="text-[10px] text-indigo-200">「毎日新聞」上側優先補正システム</p>
         </div>
       </div>
     </div>
@@ -33,90 +31,63 @@
 
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 pb-12">
 
-    <!-- 左側設定パネル -->
+    <!-- 左側設定 -->
     <div class="lg:col-span-4 flex flex-col gap-5">
       
-      <!-- APIキー設定カード -->
+      <!-- APIキー設定 -->
       <section class="bg-amber-50 p-4 rounded-xl shadow-sm border border-amber-200">
-        <h2 class="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
-          <i class="fa-solid fa-key text-amber-600"></i>
-          Gemini API キー設定
+        <h2 class="text-xs font-bold text-amber-900 mb-1.5 flex items-center gap-2">
+          <i class="fa-solid fa-key text-amber-600"></i> Gemini API キー設定
         </h2>
-        <p class="text-xs text-amber-800 mb-2">ブラウザに保存されます（他者からは見えません）。</p>
         <div class="flex gap-2">
-          <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full text-xs p-2 border border-amber-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
-          <button type="button" id="btnSaveApiKey" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg transition">保存</button>
+          <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full text-xs p-2 border border-amber-300 rounded-lg bg-white focus:outline-none font-mono">
+          <button type="button" id="btnSaveApiKey" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg">保存</button>
         </div>
         <div id="apiKeyStatus" class="text-[11px] font-bold mt-1 text-rose-600">未設定です</div>
       </section>
 
-      <!-- 補正定義カード -->
-      <section class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-          <i class="fa-solid fa-compass text-indigo-600"></i>
-          文字向き正対の判定基準
-        </h2>
-        <div class="bg-indigo-50/70 rounded-lg p-3 text-xs text-indigo-900 border border-indigo-100 space-y-1.5">
-          <div class="flex items-start gap-1.5 font-bold text-indigo-950">
-            <i class="fa-solid fa-star text-amber-500 mt-0.5"></i>
-            <span>【最優先】「毎日新聞」が正立して画像の上側に来るよう回転</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- コード照合リスト入力 -->
-      <section class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3">
+      <!-- コードリスト -->
+      <section class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-2">
         <div class="flex justify-between items-center">
-          <h2 class="text-sm font-bold text-slate-700 flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-indigo-600"></i>
-            照合用コードリスト
-          </h2>
-          <span id="codeCount" class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded border border-indigo-100">0 件</span>
+          <h2 class="text-xs font-bold text-slate-700">照合用コードリスト</h2>
+          <span id="codeCount" class="text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">0 件</span>
         </div>
-        <textarea id="codeListInput" rows="4" placeholder="例:&#10;ABC-1001&#10;ABC-1002" class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none custom-scrollbar font-mono"></textarea>
+        <textarea id="codeListInput" rows="4" placeholder="例:&#10;ABC-1001&#10;ABC-1002" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:outline-none font-mono custom-scrollbar"></textarea>
       </section>
 
-      <!-- 画像追加セクション -->
+      <!-- 画像追加 -->
       <section class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3">
-        <h2 class="text-sm font-bold text-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-images text-indigo-600"></i>
-          画像ファイル追加
-        </h2>
-        <input type="file" id="fileInput" multiple accept="image/*,.png,.jpg,.jpeg,.webp,.bmp" class="hidden">
+        <h2 class="text-xs font-bold text-slate-700">画像ファイル追加</h2>
+        <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
         <button type="button" id="btnSelectFiles" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-folder-open text-sm"></i> 画像ファイルを選択
+          <i class="fa-solid fa-folder-open"></i> 画像ファイルを選択
         </button>
-        <div id="dropZone" class="border-2 border-dashed border-slate-300 hover:border-indigo-400 bg-slate-50 transition rounded-xl p-3 text-center cursor-pointer">
-          <span class="text-xs font-medium text-slate-600">ドラッグ＆ドロップでも追加可能</span>
-        </div>
-        <button type="button" id="btnClearAll" class="w-full py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition">全画像をクリア</button>
+        <button type="button" id="btnClearAll" class="w-full py-1.5 text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">全画像をクリア</button>
       </section>
 
-      <!-- 処理ボタン -->
+      <!-- 実行ボタン -->
       <section class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3">
-        <button type="button" id="btnProcessAll" disabled class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-bolt text-amber-300"></i> 4枚並列処理をスタート
+        <button type="button" id="btnProcessAll" disabled class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-bolt text-amber-300"></i> 処理をスタート
         </button>
-        <button type="button" id="btnDownloadZip" disabled class="btn-download-zip w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+        <button type="button" id="btnDownloadZip" disabled class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-file-zipper"></i> ZIP保存
         </button>
       </section>
-
     </div>
 
     <!-- 右側結果プレビュー -->
     <div class="lg:col-span-8 flex flex-col gap-4">
       <div class="bg-white px-4 py-3 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center text-xs">
-        <div>全画像: <span id="statTotal" class="text-indigo-600 font-extrabold">0</span> 件 | 補正済: <span id="statSuccess" class="text-emerald-600 font-bold">0</span></div>
+        <div>全画像: <span id="statTotal" class="text-indigo-600 font-bold">0</span> 件 | 処理済: <span id="statSuccess" class="text-emerald-600 font-bold">0</span></div>
         <div id="progressBox" class="hidden text-indigo-600 font-bold flex items-center gap-2">
           <i class="fa-solid fa-circle-notch fa-spin"></i> <span id="progressText">解析中...</span>
         </div>
       </div>
 
-      <div id="imageList" class="flex flex-col gap-4">
-        <div id="emptyListNotice" class="bg-white p-12 rounded-xl border border-slate-200 text-center flex flex-col items-center gap-3">
-          <i class="fa-regular fa-images text-4xl text-slate-300"></i>
-          <p class="text-sm font-medium text-slate-500">画像ファイルを追加してください</p>
+      <div id="imageList" class="flex flex-col gap-3">
+        <div id="emptyListNotice" class="bg-white p-12 rounded-xl border border-slate-200 text-center text-slate-400 text-xs">
+          画像ファイルを追加してください
         </div>
       </div>
     </div>
@@ -137,7 +108,7 @@
       if (savedKey) {
         userApiKey = savedKey;
         apiKeyInput.value = savedKey;
-        apiKeyStatus.textContent = "設定済み (保存されています)";
+        apiKeyStatus.textContent = "設定済み";
         apiKeyStatus.className = "text-[11px] font-bold mt-1 text-emerald-600";
       }
       const savedCodes = localStorage.getItem('app_saved_code_list');
@@ -149,13 +120,10 @@
 
     btnSaveApiKey.addEventListener('click', () => {
       const val = apiKeyInput.value.trim();
-      if (!val) {
-        alert("APIキーを入力してください");
-        return;
-      }
+      if (!val) { alert("APIキーを入力してください"); return; }
       userApiKey = val;
       localStorage.setItem('gemini_user_api_key', val);
-      apiKeyStatus.textContent = "設定済み (保存されています)";
+      apiKeyStatus.textContent = "設定済み";
       apiKeyStatus.className = "text-[11px] font-bold mt-1 text-emerald-600";
       alert("APIキーを保存しました！");
     });
@@ -168,44 +136,40 @@
     }
     document.getElementById('codeListInput').addEventListener('input', updateValidCodes);
 
-    const btnSelectFiles = document.getElementById('btnSelectFiles');
-    const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const imageList = document.getElementById('imageList');
     const emptyListNotice = document.getElementById('emptyListNotice');
     const btnProcessAll = document.getElementById('btnProcessAll');
-    const btnDownloadZipList = document.querySelectorAll('.btn-download-zip');
+    const btnDownloadZip = document.getElementById('btnDownloadZip');
 
-    btnSelectFiles.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('click', () => fileInput.click());
+    document.getElementById('btnSelectFiles').addEventListener('click', () => fileInput.click());
+    document.getElementById('btnClearAll').addEventListener('click', () => {
+      fileItems = [];
+      renderList();
+    });
+
     fileInput.addEventListener('change', async (e) => {
       if (e.target.files) {
-        await handleFiles(e.target.files);
+        for (const file of Array.from(e.target.files)) {
+          if (!file.type?.startsWith('image/')) continue;
+          const resized = await resizeImageFile(file, 600, 0.6);
+          fileItems.push({
+            id: 'img_' + Math.random().toString(36).substr(2, 9),
+            originalName: file.name,
+            newName: file.name,
+            angle: 0,
+            matchedCode: null,
+            status: 'idle',
+            base64Data: resized.base64,
+            displayUrl: resized.dataUrl
+          });
+        }
         fileInput.value = '';
+        renderList();
       }
     });
 
-    async function handleFiles(files) {
-      for (const file of Array.from(files)) {
-        if (!file.type?.startsWith('image/')) continue;
-        const resized = await resizeImageFile(file, 640, 0.65);
-        fileItems.push({
-          id: 'img_' + Math.random().toString(36).substr(2, 9),
-          originalName: file.name,
-          newName: file.name,
-          angle: 0,
-          matchedCode: null,
-          reason: '未処理',
-          topElement: '-',
-          status: 'idle',
-          base64Data: resized.base64,
-          displayUrl: resized.dataUrl
-        });
-      }
-      renderList();
-    }
-
-    function resizeImageFile(file, maxDim = 640, quality = 0.65) {
+    function resizeImageFile(file, maxDim = 600, quality = 0.6) {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -234,6 +198,7 @@
         imageList.innerHTML = '';
         imageList.appendChild(emptyListNotice);
         btnProcessAll.disabled = true;
+        btnDownloadZip.disabled = true;
         return;
       }
       emptyListNotice.classList.add('hidden');
@@ -242,15 +207,15 @@
 
       fileItems.forEach(item => {
         const card = document.createElement('div');
-        card.className = "bg-white rounded-xl border border-slate-200 p-3.5 flex items-center justify-between gap-3 shadow-sm";
+        card.className = "bg-white rounded-xl border border-slate-200 p-3 flex items-center justify-between gap-3 shadow-sm text-xs";
         card.innerHTML = `
           <div class="flex items-center gap-3">
-            <div class="w-16 h-16 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden">
+            <div class="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden">
               <img id="img_${item.id}" src="${item.displayUrl}" class="max-h-full max-w-full object-contain" style="transform: rotate(${item.angle}deg);">
             </div>
             <div>
-              <span class="font-bold text-sm text-indigo-600 font-mono" id="name_${item.id}">${item.newName}</span>
-              <div class="text-xs text-slate-500 mt-0.5">回転: <span id="deg_${item.id}">${item.angle}°</span> | 検出: <span id="top_${item.id}">${item.topElement}</span></div>
+              <span class="font-bold text-indigo-600 font-mono" id="name_${item.id}">${item.newName}</span>
+              <div class="text-[10px] text-slate-500 mt-0.5">回転: <span id="deg_${item.id}">${item.angle}°</span> | 状態: <span id="st_${item.id}">${item.status === 'done' ? '完了' : '待機中'}</span></div>
             </div>
           </div>
           <button type="button" onclick="removeItem('${item.id}')" class="text-slate-400 hover:text-rose-500 p-2"><i class="fa-solid fa-xmark"></i></button>
@@ -258,6 +223,8 @@
         imageList.appendChild(card);
       });
       document.getElementById('statTotal').textContent = fileItems.length;
+      document.getElementById('statSuccess').textContent = fileItems.filter(i => i.status === 'done').length;
+      btnDownloadZip.disabled = fileItems.filter(i => i.status === 'done').length === 0;
     }
 
     window.removeItem = function(id) {
@@ -266,68 +233,64 @@
     }
 
     btnProcessAll.addEventListener('click', async () => {
-      if (!userApiKey) {
-        alert("先に画面上部でGemini APIキーを設定してください。");
-        return;
-      }
+      if (!userApiKey) { alert("Gemini APIキーを設定してください。"); return; }
       btnProcessAll.disabled = true;
       document.getElementById('progressBox').classList.remove('hidden');
 
+      let successCount = 0;
       for (const item of fileItems) {
         try {
-          await processItem(item);
-        } catch (e) {
-          console.error(e);
+          const prompt = `画像から、文字が正しく読める向きにするための追加回転角度(0, 90, 180, 270 のいずれか)と、画像内に含まれるIDコードを判定してください。優先条件として「毎日新聞」の文字が正立して上側に来る向きを正解としてください。候補コードリスト: ${JSON.stringify(validCodes)}。JSONフォーマットのみで回答してください: {"rotateCW": 0, "matchedCode": "一致したコードまたはnull"}`;
+          
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userApiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: item.base64Data } }] }],
+              generationConfig: { responseMimeType: "application/json" }
+            })
+          });
+
+          const data = await res.json();
+          if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const parsed = JSON.parse(data.candidates[0].content.parts[0].text);
+            item.angle = (item.angle + (parsed.rotateCW || 0)) % 360;
+            if (parsed.matchedCode) {
+              item.matchedCode = parsed.matchedCode;
+              item.newName = `${parsed.matchedCode}.jpg`;
+            }
+            item.status = 'done';
+            successCount++;
+
+            document.getElementById(`name_${item.id}`).textContent = item.newName;
+            document.getElementById(`deg_${item.id}`).textContent = `${item.angle}°`;
+            document.getElementById(`st_${item.id}`).textContent = '完了';
+            document.getElementById(`img_${item.id}`).style.transform = `rotate(${item.angle}deg)`;
+          }
+        } catch (err) {
+          console.error(err);
         }
       }
 
       document.getElementById('progressBox').classList.add('hidden');
       btnProcessAll.disabled = false;
-      document.getElementById('statSuccess').textContent = fileItems.filter(i => i.status === 'done').length;
-      alert("解析が完了しました！");
+      document.getElementById('statSuccess').textContent = successCount;
+      btnDownloadZip.disabled = successCount === 0;
+      alert("すべての処理が完了しました！");
     });
 
-    async function processItem(item) {
-      const prompt = `画像から回転角度(0,90,180,270)とIDコードを判定してください。「毎日新聞」が上側になるよう調整すること。\nJSONフォーマット: {"rotateCW": 0, "topElementFound": "文字", "matchedCode": "コード", "extractedText": "ID", "reason": "理由"}`;
-      
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${userApiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: item.base64Data } }] }],
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
-
-      const data = await res.json();
-      const parsed = JSON.parse(data.candidates[0].content.parts[0].text);
-      
-      item.angle = (item.angle + (parsed.rotateCW || 0)) % 360;
-      item.topElement = parsed.topElementFound || '-';
-      item.matchedCode = parsed.matchedCode || null;
-      item.status = 'done';
-      item.newName = item.matchedCode ? `${item.matchedCode}.jpg` : item.originalName;
-
-      document.getElementById(`name_${item.id}`).textContent = item.newName;
-      document.getElementById(`deg_${item.id}`).textContent = `${item.angle}°`;
-      document.getElementById(`top_${item.id}`).textContent = item.topElement;
-      document.getElementById(`img_${item.id}`).style.transform = `rotate(${item.angle}deg)`;
-    }
-
-    btnDownloadZipList.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const done = fileItems.filter(i => i.status === 'done');
-        if (done.length === 0) return;
-        const zip = new JSZip();
-        for (const item of done) {
-          zip.file(item.newName, item.base64Data, { base64: true });
-        }
-        const blob = await zip.generateAsync({ type: 'blob' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'images.zip';
-        a.click();
-      });
+    btnDownloadZip.addEventListener('click', async () => {
+      const done = fileItems.filter(i => i.status === 'done');
+      if (done.length === 0) return;
+      const zip = new JSZip();
+      for (const item of done) {
+        zip.file(item.newName, item.base64Data, { base64: true });
+      }
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'renamed_images.zip';
+      a.click();
     });
   </script>
 </body>
